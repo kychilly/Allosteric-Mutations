@@ -1,0 +1,43 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="pyyaml" />
+          <option value="numpy" />
+          <option value="pandas" />
+          <option value="rdkit" />
+          <option value="meeko" />
+          <option value="openbabel" />
+          <option value="vina" />
+          <option value="biopython" />
+          <option value="matplotlib" />
+          <option value="seaborn" />
+          <option value="contourpy" />
+          <option value="cycler" />
+          <option value="fonttools" />
+          <option value="gemmi" />
+          <option value="kiwisolver" />
+          <option value="openbabel-wheel" />
+          <option value="packaging" />
+          <option value="pillow" />
+          <option value="pyparsing" />
+          <option value="python-dateutil" />
+          <option value="scipy" />
+          <option value="six" />
+          <option value="tabulate" />
+          <option value="tzdata" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyStubPackagesAdvertiser" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="pandas" />
+          <option value="scipy" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

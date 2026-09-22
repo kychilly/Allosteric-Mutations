@@ -1,0 +1,6 @@
+project_name: "TEM1_Allosteric_Resistance"
+target_pdb: "1ZG4"
+distance_cutoffs: [4.5, 5.0, 5.5]  # Multiple distance cutoffs (Å) for RIN edge sensitivity analysisactive_site_residue: 70  # Ser70 catalytic nucleophile
+distal_threshold_min: 15.0  # Minimum distance (Å) for distal mutations
+distal_threshold_max: 25.0  # Maximum distance window (Å)
+random_seed: 1
