@@ -1,0 +1,6 @@
+cutoff_angstroms,nodes,edges,active_site_residue,active_site_degree_centrality,active_site_betweenness_centrality,active_site_current_flow_betweenness
+4.0,263,1119,70,0.0305,0.0396,0.0338
+4.5,263,1326,70,0.0458,0.038,0.0443
+5.0,263,1471,70,0.0534,0.0372,0.0435
+5.5,263,1642,70,0.0573,0.0354,0.0363
+6.0,263,1808,70,0.0611,0.0348,0.0318
