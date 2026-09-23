@@ -1,3 +1,5 @@
+# Lowkey i messed up the code to create the figures, just know that theyre in data/PyMOL_figures, sorry ;-;
+
 import os
 import sys
 import numpy as np
@@ -20,7 +22,6 @@ def find_line_pixel_center(temp_image_path):
         return None
 
     # PyMOL blue color filter (high blue, lower red/green)
-    # Convert to HSV or use direct channel thresholding for vivid blue dashes
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
 
     # Define range for pure blue in HSV (PyMOL blue dashes)
@@ -77,16 +78,18 @@ def add_post_render_label(image_path, text, pixel_pos):
     img.save(image_path)
 
 
-def render_pymol_figure():
-    print("[*] Generating publication-grade PyMOL render with 2D pixel-center alignment...")
+def render_pymol_figures():
+    print("[*] Generating publication-grade PyMOL figures...")
 
     pymol.finish_launching(['pymol', '-c'])
 
     clean_pdb_path = os.path.join("data", "1ZG4_clean.pdb")
-    eval_dir = os.path.join("data", "eval")
-    os.makedirs(eval_dir, exist_ok=True)
-    output_image_path = os.path.join(eval_dir, "pymol_allosteric_pathways.png")
-    temp_dash_path = os.path.join(eval_dir, "temp_dash.png")
+    output_dir = os.path.join("data", "PyMOL_figures")
+    os.makedirs(output_dir, exist_ok=True)
+
+    detailed_image_path = os.path.join(output_dir, "pymol_allosteric_pathways.png")
+    global_overview_path = os.path.join(output_dir, "global_boundary_overview.png")
+    temp_dash_path = os.path.join(output_dir, "temp_dash.png")
 
     pymol.cmd.reinitialize()
     pymol.cmd.load(clean_pdb_path, "tem1")
@@ -96,7 +99,7 @@ def render_pymol_figure():
     pymol.cmd.viewport(width, height)
 
     # Rendering settings
-    pymol.cmd.bg_color("white")
+    pymol.cmd.bg_color("black")  # Set to black matching your preferred style
     pymol.cmd.set("ray_shadows", "1")
     pymol.cmd.set("antialias", "3")
     pymol.cmd.set("specular", "0.3")
@@ -158,7 +161,23 @@ def render_pymol_figure():
     else:
         pymol.cmd.select("bottlenecks", "none")
 
-    # Lock camera view framing
+    # ==========================================
+    # 1. GENERATE GLOBAL BOUNDARY OVERVIEW
+    # ==========================================
+    print("[*] Generating Global 15-20 Å Boundary Overview figure...")
+    pymol.cmd.hide("dash", "all")
+    pymol.cmd.zoom(obj, "1.8")
+    pymol.cmd.turn("y", 20)
+    pymol.cmd.turn("x", 10)
+
+    pymol.cmd.ray(width, height)
+    pymol.cmd.png(global_overview_path, dpi=300, ray=1)
+    print(f"[+] Saved global overview to {global_overview_path}")
+
+    # ==========================================
+    # 2. GENERATE DETAILED ZOOMED NETWORK (Your Exact Script)
+    # ==========================================
+    print("[*] Generating detailed zoomed network figure...")
     pymol.cmd.select("functional_core", "active_site or bottlenecks")
     pymol.cmd.center("functional_core")
     pymol.cmd.zoom("functional_core", "3")
@@ -166,9 +185,9 @@ def render_pymol_figure():
     pymol.cmd.turn("x", -15)
 
     # Ray-trace master image with all lines visible
-    print("[*] Ray-tracing master figure...")
+    print("[*] Ray-tracing detailed master figure...")
     pymol.cmd.ray(width, height)
-    pymol.cmd.png(output_image_path, dpi=300, ray=1)
+    pymol.cmd.png(detailed_image_path, dpi=300, ray=1)
 
     # Find exact 2D pixel coordinates for each line by isolating them temporarily
     final_label_data = []
@@ -181,8 +200,7 @@ def render_pymol_figure():
 
         pixel_center = find_line_pixel_center(temp_dash_path)
         if pixel_center:
-            print(
-                f"[+] Residue {resi} ({dist_val:.1f} Å) 2D Pixel Center detected at: X={pixel_center[0]:.1f}, Y={pixel_center[1]:.1f}")
+            print(f"[+] Residue {resi} ({dist_val:.1f} Å) 2D Pixel Center detected at: X={pixel_center[0]:.1f}, Y={pixel_center[1]:.1f}")
             final_label_data.append((f"{dist_val:.1f} Å", pixel_center))
         else:
             print(f"[-] Warning: Could not detect pixel center for residue {resi}")
@@ -200,11 +218,11 @@ def render_pymol_figure():
     # Apply labels precisely on the detected 2D pixel centers
     print("[*] Applying post-render distance labels onto detected 2D centers...")
     for label_text, pixel_pos in final_label_data:
-        add_post_render_label(output_image_path, label_text, pixel_pos)
+        add_post_render_label(detailed_image_path, label_text, pixel_pos)
 
-    print(f"[+] Saved final figure to {output_image_path}")
+    print(f"[+] Saved detailed figure to {detailed_image_path}")
     pymol.cmd.quit()
 
 
 if __name__ == "__main__":
-    render_pymol_figure()
+    render_pymol_figures()
