@@ -1,0 +1,5 @@
+Network Disruption Feature,Coefficient (Beta),Absolute Weight
+Δ Shortest Path Length,3.8072,3.8072
+Global Efficiency Drop,0.8048,0.8048
+Δ Current-Flow Centrality,0.1457,0.1457
+Δ Bridging Betweenness,0.0699,0.0699
