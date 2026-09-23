@@ -1,0 +1,3 @@
+model,mean_roc_auc,std_roc_auc
+Logistic Regression (L2),0.999,0.0019
+Random Forest Classifier,1.0,0.0

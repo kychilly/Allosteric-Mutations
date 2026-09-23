@@ -1,0 +1,5 @@
+feature,mann_whitney_u,p_value,significant
+delta_shortest_path,5223.0,2.464094957067505e-24,True
+global_efficiency_drop,5225.0,2.2742450057844304e-24,True
+delta_current_flow,5225.0,2.2742450057844304e-24,True
+delta_bridging_betweenness,5225.0,2.2742450057844304e-24,True
