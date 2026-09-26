@@ -4,9 +4,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_predict
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, auc
+
+
+def truncate_auc(val, decimals=3):
+    """Truncate a float to the specified number of decimal places without rounding."""
+    multiplier = 10 ** decimals
+    return int(val * multiplier) / multiplier
 
 
 def generate_plots():
@@ -77,24 +84,29 @@ def generate_plots():
     plt.close()
     print(f"[✓] Saved distribution plots to {dist_plot_path}")
 
-    # 3. Generate ROC-AUC Curve Plot
-    print("[*] Training model and generating ROC-AUC curve...")
+    # 3. Generate ROC-AUC Curve Plot using 5-Fold Cross-Validation
+    print("[*] Performing 5-fold cross-validation and generating ROC-AUC curves...")
     X = df[feature_cols].fillna(0.0)
     y = df["label"].values
 
-    # Train-test split for ROC visualization
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+    # Logistic Regression Model (5-Fold CV Probabilities)
+    classifier_lr = LogisticRegression(random_state=42)
+    y_scores_lr = cross_val_predict(classifier_lr, X, y, cv=5, method="predict_proba")[:, 1]
+    fpr_lr, tpr_lr, _ = roc_curve(y, y_scores_lr)
+    roc_auc_lr = truncate_auc(auc(fpr_lr, tpr_lr), 3)
 
-    classifier = LogisticRegression(random_state=42)
-    classifier.fit(X_train, y_train)
-    y_scores = classifier.predict_proba(X_test)[:, 1]
+    # Random Forest Classifier Model (5-Fold CV Probabilities)
+    classifier_rf = RandomForestClassifier(random_state=42)
+    y_scores_rf = cross_val_predict(classifier_rf, X, y, cv=5, method="predict_proba")[:, 1]
+    fpr_rf, tpr_rf, _ = roc_curve(y, y_scores_rf)
+    roc_auc_rf = truncate_auc(auc(fpr_rf, tpr_rf), 3)
 
-    fpr, tpr, _ = roc_curve(y_test, y_scores)
-    roc_auc = auc(fpr, tpr)
-
+    # Plotting both curves with truncated values
     plt.figure(figsize=(8, 6))
-    plt.plot(fpr, tpr, color="#2ca02c", lw=2.5, label=f"Logistic Regression (AUC = {roc_auc:.4f})")
-    plt.plot([0, 1], [0, 1], color="navy", lw=1.5, linestyle="--", label="Random Chance (AUC = 0.5000)")
+    plt.plot(fpr_lr, tpr_lr, color="#2ca02c", lw=2.5, label=f"Logistic Regression (AUC = {roc_auc_lr:.3f})")
+    plt.plot(fpr_rf, tpr_rf, color="#ff7f0e", lw=2.0, linestyle="-.",
+             label=f"Random Forest Classifier (AUC = {roc_auc_rf:.3f})")
+    plt.plot([0, 1], [0, 1], color="navy", lw=1.5, linestyle="--", label="Random Chance (AUC = 0.500)")
 
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
